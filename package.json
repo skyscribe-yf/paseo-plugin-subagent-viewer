@@ -1,0 +1,44 @@
+{
+  "name": "paseo-plugin-subagent-viewer",
+  "version": "0.1.0",
+  "description": "Paseo plugin that observes pi-subagents runs: live child agents, current tool, output tail",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "paseo",
+    "paseo-plugin",
+    "pi",
+    "pi-subagents",
+    "subagents",
+    "observability"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skyscribe-yf/paseo-plugin-subagent-viewer.git"
+  },
+  "files": [
+    "paseo-plugin.json",
+    "index.client.ts",
+    "index.client.tsx",
+    "index.server.ts",
+    "index.server.tsx",
+    "client/",
+    "server/",
+    "shared/",
+    "scripts/"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "check": "node --experimental-strip-types scripts/check.ts"
+  },
+  "devDependencies": {
+    "@getpaseo/plugin": "0.10.3",
+    "@tanstack/react-query": "^5.90.11",
+    "@types/node": "^26.6.4",
+    "@types/react": "~19.2.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3"
+  }
+}
