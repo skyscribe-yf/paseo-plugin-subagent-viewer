@@ -52,6 +52,12 @@ export const runsList = defineRpc({
     workspaceId: z.string().optional(),
     /** Default scope: only runs whose cwd or owner cwd sits under this directory. */
     workspaceDirectory: z.string().optional(),
+    /**
+     * Project root of the current workspace. A worktree workspace's directory is
+     * one checkout, so matching its project root too keeps the main checkout and
+     * nested pool/.worktrees lanes visible without leaking other projects.
+     */
+    projectRootPath: z.string().optional(),
     /** Restrict the result to one Paseo agent (its pi session and nothing else). */
     agentId: z.string().optional(),
     /** Ignore workspaceDirectory and return runs from every agent on this machine. */

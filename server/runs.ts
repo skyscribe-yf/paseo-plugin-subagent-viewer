@@ -1,6 +1,6 @@
 import type { PluginServerContext } from "@getpaseo/plugin/server";
-import { type RunDetailInput, type RunsListInput, runDetail, runsList } from "../shared/runs";
-import { findRunDir, listRuns, readRun, scanEvents, tailFile, toRunView } from "./discover";
+import { type RunDetailInput, type RunsListInput, runDetail, runsList } from "../shared/runs.ts";
+import { findRunDir, listRuns, readRun, scanEvents, tailFile, toRunView } from "./discover.ts";
 
 const OUTPUT_DETAIL_BYTES = 16 * 1024;
 
@@ -15,20 +15,36 @@ const EMPTY_DETAIL = {
 };
 
 /** Runs count as "in this workspace" when their own cwd or their owner agent's cwd is inside it. */
-function inWorkspace(cwd: string, directory: string): boolean {
+export function inWorkspace(cwd: string, directory: string): boolean {
   const normalized = directory.endsWith("/") ? directory : `${directory}/`;
   return cwd === directory || cwd.startsWith(normalized);
 }
 
-function listHandler({ agentId, workspaceDirectory, allWorkspaces, limit }: RunsListInput) {
+export function listHandler({
+  agentId,
+  workspaceDirectory,
+  projectRootPath,
+  allWorkspaces,
+  limit,
+}: RunsListInput) {
   // Fetch generous, then scope: the panel shows live runs first, so a small cap
   // would hide exactly the runs the operator wants to watch.
   const listed = listRuns({ agentId, limit: agentId ? limit : 60 });
+  // Worktree workspaces nest their lanes (pool slots, .worktrees) under the
+  // project root rather than the workspace directory, and pi-subagents children
+  // have no Paseo owner to fall back on — matching the project root keeps the
+  // whole family visible to the workspace that launched it.
+  const scopes = [workspaceDirectory, projectRootPath].filter(
+    (directory): directory is string => Boolean(directory),
+  );
   const scoped =
-    !allWorkspaces && workspaceDirectory
+    !allWorkspaces && scopes.length > 0
       ? listed.runs.filter((run) =>
-          inWorkspace(run.cwd, workspaceDirectory) ||
-          (run.owner?.cwd ? inWorkspace(run.owner.cwd, workspaceDirectory) : false),
+          scopes.some(
+            (directory) =>
+              inWorkspace(run.cwd, directory) ||
+              (run.owner?.cwd ? inWorkspace(run.owner.cwd, directory) : false),
+          ),
         )
       : listed.runs;
 
@@ -63,7 +79,7 @@ function listHandler({ agentId, workspaceDirectory, allWorkspaces, limit }: Runs
   };
 }
 
-function detailHandler({ runId }: RunDetailInput) {
+export function detailHandler({ runId }: RunDetailInput) {
   const dir = findRunDir(runId);
   if (!dir) return EMPTY_DETAIL;
   const run = readRun(dir);

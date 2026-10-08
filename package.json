@@ -29,7 +29,8 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "check": "node --experimental-strip-types scripts/check.ts"
+    "check": "node --experimental-strip-types scripts/check.ts",
+    "check:rpc": "node --experimental-strip-types scripts/check-rpc.ts"
   },
   "devDependencies": {
     "@getpaseo/plugin": "0.10.3",

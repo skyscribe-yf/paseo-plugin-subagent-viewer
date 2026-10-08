@@ -27,18 +27,30 @@ function formatDuration(ms: number): string {
 export function RunPanel({ theme, layout, workspaceId }: PluginWorkspacePanelProps) {
   const list = useRpc(runsList);
   const detail = useRpc(runDetail);
-  const workspaceDirectory = useWorkspace(workspaceId, (workspace) => workspace.directory);
+  const scope = useWorkspace(workspaceId, (workspace) => ({
+    directory: workspace.directory,
+    projectRootPath: workspace.projectRootPath,
+  }));
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [allWorkspaces, setAllWorkspaces] = useState(false);
   const styles = usePanelStyles(theme, layout.compact);
 
   const runs = useQuery({
-    queryKey: ["subagent-viewer", "runs", workspaceId, selectedAgent, allWorkspaces, workspaceDirectory],
+    queryKey: [
+      "subagent-viewer",
+      "runs",
+      workspaceId,
+      selectedAgent,
+      allWorkspaces,
+      scope?.directory,
+      scope?.projectRootPath,
+    ],
     queryFn: () =>
       list({
         workspaceId,
-        workspaceDirectory: workspaceDirectory ?? undefined,
+        workspaceDirectory: scope?.directory,
+        projectRootPath: scope?.projectRootPath,
         agentId: selectedAgent ?? undefined,
         allWorkspaces: allWorkspaces || undefined,
         limit: 40,
@@ -107,7 +119,7 @@ export function RunPanel({ theme, layout, workspaceId }: PluginWorkspacePanelPro
                   onPress={() => setAllWorkspaces((value) => !value)}
                   style={[styles.chip, allWorkspaces && styles.chipActive]}
                 >
-                  <Text style={styles.chipText}>{allWorkspaces ? "全部机器" : "仅此 workspace"}</Text>
+                  <Text style={styles.chipText}>{allWorkspaces ? "全部机器" : "仅此项目"}</Text>
                 </Pressable>
               </View>
             ) : null}
@@ -117,7 +129,7 @@ export function RunPanel({ theme, layout, workspaceId }: PluginWorkspacePanelPro
               <Text style={styles.empty}>
                 {allWorkspaces
                   ? "这台机器上没有 pi-subagents 运行记录。"
-                  : "这个 workspace 下没有 pi-subagents 运行记录（可用上方按钮查看整机）。"}
+                  : "这个项目下没有 pi-subagents 运行记录（可用上方按钮查看整机）。"}
               </Text>
             ) : null}
 

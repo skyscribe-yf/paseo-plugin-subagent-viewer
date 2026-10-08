@@ -26,10 +26,12 @@ is what ties a run back to the Paseo agent that owns it.
 
 ## What it contributes
 
-- **`Subagents` workspace panel** — scoped to the current workspace by default (runs whose cwd, or
-  whose owner agent's cwd, is inside the workspace directory), with a one-click switch to every
-  agent on the machine. Live rows poll every 1.5s and show agent, state, elapsed/idle time, step
-  progress and pid; selecting a run shows its current tool call, tool histogram and output tail.
+- **`Subagents` workspace panel** — scoped to the current project by default (runs whose cwd, or
+  whose owner agent's cwd, is inside the workspace directory **or its project root**, so a worktree
+  workspace still shows the main checkout and its nested `pool/` / `.worktrees/` lanes), with a
+  one-click switch to every agent on the machine. Live rows poll every 1.5s and show agent, state,
+  elapsed/idle time, step progress and pid; selecting a run shows its current tool call, tool
+  histogram and output tail.
 - **Inline timeline card** — pi's `subagent` and `subagent_supervisor` tool calls in the parent
   agent's timeline are replaced by a live fleet card (2s poll while something is running), so you
   can watch children without switching panels.
